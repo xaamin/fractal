@@ -3,7 +3,7 @@
     "description": "Laravel wrapper for fractal",
     "require": {
         "league/fractal": "^0.16.0",
-        "illuminate/support": "^5.*"
+        "illuminate/support": "5.*"
     },
     "authors": [
         {
