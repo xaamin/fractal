@@ -11,7 +11,9 @@
             "email": "xaamin@outlook.com"
         }
     ],
-    "psr-4": {
-        "Xaamin\\Fractal\\": "src/"
-    }
+    "autoload": {
+        "psr-4": {
+            "Xaamin\\Session\\": "src/"
+        }
+    },
 }
