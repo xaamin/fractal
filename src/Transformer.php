@@ -1,6 +1,6 @@
 <?php  namespace Xaamin\Fractal;
 
-use Exception;
+use BadMethodCallException;
 use League\Fractal\Manager;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
@@ -49,16 +49,27 @@ class Transformer
 
     public function with($includes)
     {
-        $this->includes = (array)$includes;
+        $this->includes = $this->parseRequestedIncludes($includes);
 
         return $this;
     }
 
     public function without($includes)
     {
-        $this->excludes = (array)$includes;
+        $this->excludes = $this->parseRequestedIncludes($includes);
 
         return $this;
+    }
+
+    protected function parseRequestedIncludes($includes) {
+
+        if (is_string($includes)) {
+            $includes = explode(',', $includes);
+            $includes = array_filter($includes, 'trim');
+            $includes = array_map('trim', $includes);
+        }
+
+        return $includes;
     }
 
     public function collection($data, $transformer = null, $resourceKey = null)
@@ -117,10 +128,10 @@ class Transformer
 
     public function __call($method, $parameters)
     {
-        if (is_callable($this->manager, $method)) {
-            return call_user_func_array([$this, $method], $parameters);
+        if (is_callable([$this->manager, $method])) {
+            return call_user_func_array([$this->manager, $method], $parameters);
         }
 
-        throw new Exception("Error Processing Request", 1);
+        throw new BadMethodCallException("Error Processing Request", 1);
     }
 }
