@@ -1,13 +1,17 @@
 <?php  namespace Xaamin\Fractal;
 
+use LogicException;
 use BadMethodCallException;
 use League\Fractal\Manager;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
+use League\Fractal\Pagination\Cursor;
 use League\Fractal\Resource\Collection;
+use Illuminate\Support\Collection as LaravelCollection;
 use League\Fractal\TransformerAbstract;
 use Illuminate\Contracts\Support\Arrayable;
 use League\Fractal\Serializer\ArraySerializer;
+use League\Fractal\Pagination\CursorInterface;
 use League\Fractal\Serializer\SerializerAbstract;
 use League\Fractal\Pagination\PaginatorInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -21,6 +25,8 @@ class Transformer
     protected $manager;
 
     protected $paginator;
+
+    protected $cursor;
 
     protected $includes = [];
 
@@ -62,7 +68,6 @@ class Transformer
     }
 
     protected function parseRequestedIncludes($includes) {
-
         if (is_string($includes)) {
             $includes = explode(',', $includes);
             $includes = array_filter($includes, 'trim');
@@ -76,8 +81,16 @@ class Transformer
     {
         $resource = new Collection($data, $this->getTransformer($transformer), $resourceKey);
 
+        if ($this->cursor and $this->paginator) {
+            throw new LogicException('Only one pagination strategy must be specified, received both pagination and cursor');
+        }
+
         if ($this->paginator) {
             $resource->setPaginator($this->paginator);
+        }
+
+        if ($this->cursor) {
+            $resource->setCursor($this->cursor);
         }
 
         return $this->createData($resource);
@@ -97,9 +110,44 @@ class Transformer
         return $this->createData($resource);
     }
 
+    public function cursor($data, $transformer = null, array $meta, $resourceKey = null)
+    {
+        $current = (isset($meta['current']) and trim($meta['current']) !== '') ? $meta['current'] : null;
+        $previous = (isset($meta['previous']) and trim($meta['previous']) !== '') ? $meta['previous'] : null;
+        $next = (isset($meta['next']) and trim($meta['next']) !== '') ? $meta['next'] : null;
+
+        $resource = new Collection($data, $this->getTransformer($transformer), $resourceKey);
+        $cursor = new Cursor($current, $previous, $next, count($data));
+
+        $resource->setCursor($cursor);
+
+        return $this->createData($resource);
+    }
+
     public function paginateUsing(PaginatorInterface $paginator)
     {
+        $this->setPaginator($paginator);
+
+        return $this;
+    }
+
+    public function setPaginator(PaginatorInterface $paginator)
+    {
         $this->paginator = $paginator;
+
+        return $this;
+    }
+
+    public function paginateUsingCursor(CursorInterface $cursor)
+    {
+        $this->setCursor($cursor);
+
+        return $this;
+    }
+
+    public function setCursor(CursorInterface $cursor)
+    {
+        $this->cursor = $cursor;
 
         return $this;
     }
