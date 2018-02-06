@@ -184,6 +184,7 @@ class Transformer
         $data = $this->manager->createData($resource)->toArray();
 
         $this->includes = [];
+        $this->excludes = [];
 
         return $data;
     }
@@ -194,6 +195,6 @@ class Transformer
             return call_user_func_array([$this->manager, $method], $parameters);
         }
 
-        throw new BadMethodCallException("Error Processing Request", 1);
+        throw new BadMethodCallException('Bad method call');
     }
 }
