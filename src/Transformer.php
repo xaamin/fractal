@@ -1,19 +1,20 @@
-<?php  namespace Xaamin\Fractal;
+<?php namespace Xaamin\Fractal;
 
 use LogicException;
 use BadMethodCallException;
 use League\Fractal\Manager;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
+use Illuminate\Pagination\Paginator;
 use League\Fractal\Pagination\Cursor;
 use League\Fractal\Resource\Collection;
-use Illuminate\Support\Collection as LaravelCollection;
 use League\Fractal\TransformerAbstract;
 use Illuminate\Contracts\Support\Arrayable;
 use League\Fractal\Serializer\ArraySerializer;
 use League\Fractal\Pagination\CursorInterface;
 use League\Fractal\Serializer\SerializerAbstract;
 use League\Fractal\Pagination\PaginatorInterface;
+use Illuminate\Support\Collection as LaravelCollection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
@@ -110,7 +111,20 @@ class Transformer
         return $this->createData($resource);
     }
 
-    public function cursor($data, $transformer = null, array $meta, $resourceKey = null)
+    public function simplePaginate(Paginator $paginator, $transformer = null, $resourceKey = null)
+    {
+        $data = $paginator->items();
+
+        $meta = [
+            'current' => $paginator->currentPage(),
+            'previous' => $paginator->currentPage() - 1 ? $paginator->currentPage() - 1 : null,
+            'next' => $paginator->currentPage() + 1,
+        ];
+
+        return $this->cursor($data, $transformer, $meta, $resourceKey);
+    }
+
+    public function cursor($data, $transformer = null, array $meta = [], $resourceKey = null)
     {
         $current = (isset($meta['current']) and trim($meta['current']) !== '') ? $meta['current'] : null;
         $previous = (isset($meta['previous']) and trim($meta['previous']) !== '') ? $meta['previous'] : null;
