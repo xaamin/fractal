@@ -1,8 +1,10 @@
 <?php
 namespace Xaamin\Fractal\Providers\Laravel;
 
-use Xaamin\Fractal\Transformer;
+use Xaamin\Fractal\Fractal;
+use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider;
+use Xaamin\Fractal\Serializer\ArraySerializer;
 
 class FractalServiceProvider extends ServiceProvider
 {
@@ -22,8 +24,8 @@ class FractalServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('Xaamin\Fractal\Transformer', function ($app) {
-            return new Transformer;
+        $this->app->bind('Xaamin\Fractal\Fractal', function ($app) {
+            return new Fractal(new Manager(), new ArraySerializer);
         });
     }
 }

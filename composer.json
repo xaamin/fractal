@@ -2,8 +2,8 @@
     "name": "xaamin/fractal",
     "description": "Laravel wrapper for fractal",
     "require": {
-        "league/fractal": "^0.16.0",
-        "illuminate/support": "5.*"
+        "league/fractal": "^0.19.2",
+        "illuminate/support": "^5.0 || ^6.0 || ^7.0"
     },
     "authors": [
         {
@@ -12,6 +12,9 @@
         }
     ],
     "autoload": {
+        "files": [
+            "helpers/fractal.php"
+        ],
         "psr-4": {
             "Xaamin\\Fractal\\": "src/"
         }
