@@ -1,8 +1,8 @@
 <?php
-namespace Xaamin\Fractal\Providers\Laravel;
+namespace Xaamin\Fractal\Providers;
 
-use Xaamin\Fractal\Fractal;
 use League\Fractal\Manager;
+use Xaamin\Fractal\Fractal;
 use Illuminate\Support\ServiceProvider;
 use Xaamin\Fractal\Serializer\ArraySerializer;
 
