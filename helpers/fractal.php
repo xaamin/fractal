@@ -2,7 +2,7 @@
 
 use Xaamin\Fractal\Facades\Fractal;
 
-if (! function_exists('fractal')) {
+if (!function_exists('fractal')) {
     /**
      * @param null|mixed $data
      * @param null|callable|\League\Fractal\TransformerAbstract $transformer
