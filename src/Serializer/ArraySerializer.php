@@ -2,8 +2,8 @@
 namespace Xaamin\Fractal\Serializer;
 
 use League\Fractal\Pagination\PaginatorInterface;
-use League\Fractal\Serializer\ArraySerializer as BaseArraySerializer;
 use Xaamin\Fractal\Pagination\IlluminateSimplePaginatorAdapter;
+use League\Fractal\Serializer\ArraySerializer as BaseArraySerializer;
 
 class ArraySerializer extends BaseArraySerializer
 {
@@ -40,7 +40,7 @@ class ArraySerializer extends BaseArraySerializer
      */
     public function null()
     {
-        return [];
+        return null;
     }
 
      /**
