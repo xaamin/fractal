@@ -2,19 +2,20 @@
 
 use LogicException;
 use BadMethodCallException;
-use League\Fractal\Manager;
 use Illuminate\Support\Arr;
+use League\Fractal\Manager;
 use InvalidArgumentException;
 use League\Fractal\Resource\Item;
 use Illuminate\Pagination\Paginator;
 use League\Fractal\Pagination\Cursor;
+use League\Fractal\Resource\Primitive;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Resource\Collection;
 use Illuminate\Contracts\Support\Arrayable;
-use League\Fractal\Serializer\ArraySerializer;
 use League\Fractal\Pagination\CursorInterface;
-use League\Fractal\Serializer\SerializerAbstract;
+use League\Fractal\Serializer\ArraySerializer;
 use League\Fractal\Pagination\PaginatorInterface;
+use League\Fractal\Serializer\SerializerAbstract;
 use Illuminate\Support\Collection as LaravelCollection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
@@ -44,6 +45,12 @@ class Fractal
      */
     protected static $serializer;
 
+    /**
+     * Constructor
+     *
+     * @param Manager|null $manager
+     * @param SerializerAbstract|null $serializer
+     */
     public function __construct(Manager $manager = null, SerializerAbstract $serializer = null)
     {
         if ($serializer && !static::$serializer) {
@@ -58,11 +65,27 @@ class Fractal
         $this->manager->setSerializer($serializer ? : ($defaultSerializer ? : new ArraySerializer));
     }
 
+    /**
+     * Set the default serializer
+     *
+     * @param SerializerAbstract $serializer
+     *
+     * @return void
+     */
     public static function setDefaultSerializer(SerializerAbstract $serializer)
     {
         static::$serializer = $serializer;
     }
 
+    /**
+     * Create a new resource by guessing the type
+     *
+     * @param array|array<midex> $data
+     * @param null|string|Closure|\League\Fractal\TransformerAbstract $transformer
+     * @param string|null $resourceKey
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public static function make($data = null, $transformer = null, $resourceKey = null)
     {
         $fractal = new static(new Manager());
@@ -80,22 +103,43 @@ class Fractal
         } else if ($data instanceof LaravelCollection) {
             $fractal->collection($data, $transformer, $resourceKey);
         } else {
-            // Primitive
+            $fractal->primitive($data, $transformer, $resourceKey);
         }
 
         return $fractal;
     }
 
+    /**
+     * Add includes
+     *
+     * @param string@string[] $includes
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function including($includes)
     {
         return $this->with($includes);
     }
 
+    /**
+     * Omit includes
+     *
+     * @param string@string[] $includes
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function excluding($includes)
     {
         return $this->without($includes);
     }
 
+    /**
+     * Add includes
+     *
+     * @param string@string[] $includes
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function with($includes)
     {
         $this->includes = $includes === null ? '' : $includes;
@@ -103,6 +147,13 @@ class Fractal
         return $this;
     }
 
+    /**
+     * Omit includes
+     *
+     * @param string@string[] $includes
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function without($excludes)
     {
         $this->excludes = $excludes === null ? '' : $excludes;
@@ -110,6 +161,11 @@ class Fractal
         return $this;
     }
 
+    /**
+     * Get all includes
+     *
+     * @return string[]
+     */
     public function getIncludes()
     {
         return $this->manager
@@ -118,6 +174,13 @@ class Fractal
             ->getRequestedIncludes();
     }
 
+    /**
+     * Get excluded includes
+     *
+     * @param string@string[] $includes
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function getExcludes()
     {
         return $this->manager
@@ -126,6 +189,15 @@ class Fractal
             ->getRequestedExcludes();
     }
 
+    /**
+     *  Set the collection data that must be transformed
+     *
+     * @param mixed $data
+     * @param null|callable|\League\Fractal\TransformerAbstract $transformer
+     * @param string|null $resourceKey
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function collection($data, $transformer = null, $resourceKey = null)
     {
         $resource = new Collection($data, $this->getTransformer($transformer), $resourceKey);
@@ -147,9 +219,18 @@ class Fractal
         return $this;
     }
 
-    public function item($data, $transformer = null, $resourceKey = null)
+    /**
+     * Set the item data that must be transformed.
+     *
+     * @param mixed $data
+     * @param null|callable|\League\Fractal\TransformerAbstract $transformer
+     * @param string|null $resourceKey
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
+    public function primitive($data, $transformer = null, $resourceKey = null)
     {
-        $resource = new Item($data, $this->getTransformer($transformer), $resourceKey);
+        $resource = new Primitive($data, $transformer, $resourceKey);
 
         $this->resource = $resource;
 
@@ -157,12 +238,31 @@ class Fractal
     }
 
     /**
-     * Paginate resources
+     * Set the item data that must be transformed.
+     *
+     * @param mixed $data
+     * @param null|callable|\League\Fractal\TransformerAbstract $transformer
+     * @param string|null $resourceKey
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
+    public function item($data, $transformer = null, $resourceKey = null)
+    {
+        $resource = new Item($data, $transformer, $resourceKey);
+
+        $this->resource = $resource;
+
+        return $this;
+    }
+
+    /**
+     * Set the paginated data that must be transformed.
      *
      * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator|Illuminate\Contracts\Pagination\Paginator $paginator
-     * @param [type] $transformer
-     * @param [type] $resourceKey
-     * @return void
+     * @param null|callable|\League\Fractal\TransformerAbstract $transformer
+     * @param string|null $resourceKey
+     *
+     * @return \Xaamin\Fractal\Fractal
      */
     public function paginate($paginator, $transformer = null, $resourceKey = null)
     {
@@ -188,6 +288,15 @@ class Fractal
         return $this;
     }
 
+    /**
+     * Set the cursor data that must be transformed.
+     *
+     * @param array<string,string|int>
+     * @param null|callable|\League\Fractal\TransformerAbstract $transformer
+     * @param string|null $resourceKey
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function cursor($data, $transformer = null, array $meta = [], $resourceKey = null)
     {
         $current = (isset($meta['current']) and trim($meta['current']) !== '') ? $meta['current'] : null;
@@ -199,9 +308,18 @@ class Fractal
 
         $resource->setCursor($cursor);
 
-        return $this->createData($resource);
+        $this->resource = $resource;
+
+        return $this;
     }
 
+    /**
+     * Set the paginator for the data
+     *
+     * @param PaginatorInterface $paginator
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function setPaginator(PaginatorInterface $paginator)
     {
         $this->paginator = $paginator;
@@ -209,6 +327,13 @@ class Fractal
         return $this;
     }
 
+    /**
+     * Set the cursor for the data
+     *
+     * @param CursorInterface $cursor
+     *
+     * @return \Xaamin\Fractal\Fractal
+     */
     public function setCursor(CursorInterface $cursor)
     {
         $this->cursor = $cursor;
@@ -216,6 +341,13 @@ class Fractal
         return $this;
     }
 
+    /**
+     * Get the transfomer to be used
+     *
+     * @param null|callable|\League\Fractal\TransformerAbstract $transformer
+     *
+     * @return callable|\League\Fractal\TransformerAbstract
+     */
     protected function getTransformer($transformer = null)
     {
         return $transformer ?: function($data) {
@@ -227,6 +359,11 @@ class Fractal
         };
     }
 
+    /**
+     * Perform the transformation to array.
+     *
+     * @return array|null
+     */
     public function toArray()
     {
         $this->manager->parseIncludes($this->includes);
@@ -237,17 +374,33 @@ class Fractal
         return $data;
     }
 
-
-    public function toJson()
+    /**
+     * Perform the transformation to json.
+     *
+     * @param int $flags
+     *
+     * @return string
+     */
+    public function toJson($flags = 0)
     {
-        return json_encode($this->toArray());
+        return json_encode($this->toArray(), $flags);
     }
 
+    /**
+     * Perform the transformation to string.
+     *
+     * @return string
+     */
     public function toString()
     {
         return $this->toJson();
     }
 
+    /**
+     * Perform the transformation to string.
+     *
+     * @return string
+     */
     public function __toString()
     {
         return $this->toJson();
