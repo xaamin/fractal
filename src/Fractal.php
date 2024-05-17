@@ -60,8 +60,6 @@ class Fractal
         $defaultSerializer = static::$serializer;
 
         $this->manager = $manager ? : new Manager();
-        $this->manager->setSerializer($serializer ? : new ArraySerializer);
-
         $this->manager->setSerializer($serializer ? : ($defaultSerializer ? : new ArraySerializer));
     }
 
@@ -88,7 +86,7 @@ class Fractal
      */
     public static function make($data = null, $transformer = null, $resourceKey = null)
     {
-        $fractal = new static(new Manager());
+        $fractal = new static(new Manager(), static::$serializer);
 
         if ($data instanceof LengthAwarePaginator || $data instanceof Paginator) {
             $fractal->paginate($data, $transformer, $resourceKey);
