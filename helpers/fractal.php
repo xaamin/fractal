@@ -6,12 +6,12 @@ if (!function_exists('fractal')) {
     /**
      * @param null|mixed $data
      * @param null|callable|\League\Fractal\TransformerAbstract $transformer
-     * @param null|\League\Fractal\Serializer\SerializerAbstract $serializer
+     * @param null|string $resourceKey
      *
      * @return \Xaamin\Fractal\Fractal
      */
-    function fractal($data = null, $transformer = null, $serializer = null)
+    function fractal($data = null, $transformer = null, $resourceKey = null)
     {
-        return Fractal::make($data, $transformer, $serializer);
+        return Fractal::make($data, $transformer, $resourceKey);
     }
 }

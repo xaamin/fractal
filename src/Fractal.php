@@ -89,7 +89,7 @@ class Fractal
         $fractal = new static(new Manager(), static::$serializer);
 
         if ($data instanceof LengthAwarePaginator || $data instanceof Paginator) {
-            $fractal->paginate($data, $transformer, $resourceKey);
+            $fractal->paginate($data, $transformer, $resourceKey ?? 'data');
         } else if (is_array($data)) {
             if (Arr::isAssoc($data)) {
                 $fractal->item($data, $transformer, $resourceKey);
