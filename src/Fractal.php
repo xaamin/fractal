@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Resource\Collection;
 use Illuminate\Contracts\Support\Arrayable;
 use League\Fractal\Pagination\CursorInterface;
-use League\Fractal\Serializer\ArraySerializer;
+use Xaamin\Fractal\Serializer\ArraySerializer;
 use League\Fractal\Pagination\PaginatorInterface;
 use League\Fractal\Serializer\SerializerAbstract;
 use Illuminate\Support\Collection as LaravelCollection;

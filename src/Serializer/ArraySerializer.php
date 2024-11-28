@@ -30,7 +30,7 @@ class ArraySerializer extends BaseArraySerializer
      */
     public function item($resourceKey, array $data)
     {
-        return $data;
+        return $resourceKey ? [ $resourceKey => $data ] : $data;
     }
 
     /**
