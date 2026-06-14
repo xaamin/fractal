@@ -358,6 +358,20 @@ class Fractal
     }
 
     /**
+     * Get the resource to be transformed
+     *
+     * @return \League\Fractal\Resource\ResourceInterface
+     */
+    public function getResource()
+    {
+        if (!$this->resource) {
+            throw new LogicException('A resource is needed before transformation can occur, none set.');
+        }
+
+        return $this->resource;
+    }
+
+    /**
      * Perform the transformation to array.
      *
      * @return array|null
