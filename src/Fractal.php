@@ -21,6 +21,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Xaamin\Fractal\Pagination\IlluminateSimplePaginatorAdapter;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Fractal
 {
     /**
@@ -28,30 +31,50 @@ class Fractal
      */
     protected $manager;
 
+    /**
+     * @var \League\Fractal\Pagination\PaginatorInterface|null
+     */
     protected $paginator;
 
+    /**
+     * @var \League\Fractal\Pagination\CursorInterface|null
+     */
     protected $cursor;
 
+    /**
+     * @var \League\Fractal\Resource\ResourceAbstract|null
+     */
     protected $resource;
 
+    /**
+     * @var string|string[]
+     */
     protected $includes = [];
 
+    /**
+     * @var string|string[]
+     */
     protected $excludes = [];
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $meta = [];
 
     /**
      * Default serializaer
      *
-     * @var \League\Fractal\Serializer\SerializerAbstract
+     * @var \League\Fractal\Serializer\SerializerAbstract|null
      */
     protected static $serializer;
 
     /**
      * Constructor
      *
-     * @param Manager|null $manager
-     * @param SerializerAbstract|null $serializer
+     * @param \League\Fractal\Manager|null $manager
+     * @param \League\Fractal\Serializer\SerializerAbstract|null $serializer
      */
-    public function __construct(Manager $manager = null, SerializerAbstract $serializer = null)
+    public function __construct(?Manager $manager = null, ?SerializerAbstract $serializer = null)
     {
         if ($serializer && !static::$serializer) {
             static::$serializer = $serializer;
@@ -66,7 +89,7 @@ class Fractal
     /**
      * Set the default serializer
      *
-     * @param SerializerAbstract $serializer
+     * @param \League\Fractal\Serializer\SerializerAbstract $serializer
      *
      * @return void
      */
@@ -78,8 +101,8 @@ class Fractal
     /**
      * Create a new resource by guessing the type
      *
-     * @param array|array<midex> $data
-     * @param null|string|Closure|\League\Fractal\TransformerAbstract $transformer
+     * @param mixed $data
+     * @param null|callable|\League\Fractal\TransformerAbstract $transformer
      * @param string|null $resourceKey
      *
      * @return \Xaamin\Fractal\Fractal
@@ -110,7 +133,7 @@ class Fractal
     /**
      * Add includes
      *
-     * @param string@string[] $includes
+     * @param string|string[]|null $includes
      *
      * @return \Xaamin\Fractal\Fractal
      */
@@ -122,7 +145,7 @@ class Fractal
     /**
      * Omit includes
      *
-     * @param string@string[] $includes
+     * @param string|string[]|null $includes
      *
      * @return \Xaamin\Fractal\Fractal
      */
@@ -134,7 +157,7 @@ class Fractal
     /**
      * Add includes
      *
-     * @param string@string[] $includes
+     * @param string|string[]|null $includes
      *
      * @return \Xaamin\Fractal\Fractal
      */
@@ -148,13 +171,37 @@ class Fractal
     /**
      * Omit includes
      *
-     * @param string@string[] $includes
+     * @param string|string[]|null $excludes
      *
      * @return \Xaamin\Fractal\Fractal
      */
     public function without($excludes)
     {
         $this->excludes = $excludes === null ? '' : $excludes;
+
+        return $this;
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     *
+     * @return $this
+     */
+    public function withMeta(array $meta): self
+    {
+        $this->meta = array_replace_recursive($this->meta, $meta);
+
+        return $this;
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     *
+     * @return $this
+     */
+    public function setMeta(array $meta): self
+    {
+        $this->meta = $meta;
 
         return $this;
     }
@@ -175,9 +222,7 @@ class Fractal
     /**
      * Get excluded includes
      *
-     * @param string@string[] $includes
-     *
-     * @return \Xaamin\Fractal\Fractal
+     * @return string[]
      */
     public function getExcludes()
     {
@@ -246,7 +291,7 @@ class Fractal
      */
     public function item($data, $transformer = null, $resourceKey = null)
     {
-        $resource = new Item($data, $transformer, $resourceKey);
+        $resource = new Item($data, $this->getTransformer($transformer), $resourceKey);
 
         $this->resource = $resource;
 
@@ -256,7 +301,9 @@ class Fractal
     /**
      * Set the paginated data that must be transformed.
      *
-     * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator|Illuminate\Contracts\Pagination\Paginator $paginator
+     * Any value other than a Laravel paginator throws an InvalidArgumentException.
+     *
+     * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator<array-key, mixed>|\Illuminate\Pagination\Paginator<array-key, mixed>|mixed $paginator
      * @param null|callable|\League\Fractal\TransformerAbstract $transformer
      * @param string|null $resourceKey
      *
@@ -275,7 +322,6 @@ class Fractal
                 break;
             default:
                 throw new InvalidArgumentException('Class ' . get_class($paginator) . ' is not a paginator instance.');
-                break;
         }
 
         $resource = new Collection($paginator->items(), $this->getTransformer($transformer), $resourceKey);
@@ -289,8 +335,9 @@ class Fractal
     /**
      * Set the cursor data that must be transformed.
      *
-     * @param array<string,string|int>
+     * @param array<int, mixed> $data
      * @param null|callable|\League\Fractal\TransformerAbstract $transformer
+     * @param array{current?: string|int|null, previous?: string|int|null, next?: string|int|null} $meta
      * @param string|null $resourceKey
      *
      * @return \Xaamin\Fractal\Fractal
@@ -314,7 +361,7 @@ class Fractal
     /**
      * Set the paginator for the data
      *
-     * @param PaginatorInterface $paginator
+     * @param \League\Fractal\Pagination\PaginatorInterface $paginator
      *
      * @return \Xaamin\Fractal\Fractal
      */
@@ -328,7 +375,7 @@ class Fractal
     /**
      * Set the cursor for the data
      *
-     * @param CursorInterface $cursor
+     * @param \League\Fractal\Pagination\CursorInterface $cursor
      *
      * @return \Xaamin\Fractal\Fractal
      */
@@ -360,7 +407,7 @@ class Fractal
     /**
      * Get the resource to be transformed
      *
-     * @return \League\Fractal\Resource\ResourceInterface
+     * @return \League\Fractal\Resource\ResourceAbstract
      */
     public function getResource()
     {
@@ -374,14 +421,21 @@ class Fractal
     /**
      * Perform the transformation to array.
      *
-     * @return array|null
+     * @return array<string, mixed>|null
      */
     public function toArray()
     {
         $this->manager->parseIncludes($this->includes);
         $this->manager->parseExcludes($this->excludes);
 
-        $data = $this->manager->createData($this->resource)->toArray();
+        $resource = $this->getResource();
+
+        if ($this->meta !== []) {
+            $resource = clone $resource;
+            $resource->setMeta(array_replace_recursive($resource->getMeta(), $this->meta));
+        }
+
+        $data = $this->manager->createData($resource)->toArray();
 
         return $data;
     }
@@ -418,6 +472,16 @@ class Fractal
         return $this->toJson();
     }
 
+    /**
+     * Proxy calls to the underlying manager
+     *
+     * @param string $method
+     * @param array<int, mixed> $parameters
+     *
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
     public function __call($method, $parameters)
     {
         if (is_callable([$this->manager, $method])) {
