@@ -9,14 +9,14 @@ class IlluminateSimplePaginatorAdapter implements PaginatorInterface
     /**
      * The paginator instance.
      *
-     * @var \Illuminate\Pagination\Paginator
+     * @var \Illuminate\Pagination\Paginator<array-key, mixed>
      */
     protected $paginator;
 
     /**
      * Create a new illuminate pagination adapter.
      *
-     * @param \Illuminate\Pagination\Paginator $paginator
+     * @param \Illuminate\Pagination\Paginator<array-key, mixed> $paginator
      *
      * @return void
      */
@@ -38,7 +38,7 @@ class IlluminateSimplePaginatorAdapter implements PaginatorInterface
     /**
      * Get the last page.
      *
-     * @return int
+     * @return int|null
      */
     public function getLastPage()
     {
@@ -48,7 +48,7 @@ class IlluminateSimplePaginatorAdapter implements PaginatorInterface
     /**
      * Get the total.
      *
-     * @return int
+     * @return int|null
      */
     public function getTotal()
     {
@@ -90,7 +90,7 @@ class IlluminateSimplePaginatorAdapter implements PaginatorInterface
     /**
      * Get the paginator instance.
      *
-     * @return \Illuminate\Pagination\Paginator
+     * @return \Illuminate\Pagination\Paginator<array-key, mixed>
      */
     public function getPaginator()
     {

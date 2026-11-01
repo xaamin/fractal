@@ -25,5 +25,29 @@
         "Xaamin\\Fractal\\Providers\\FractalServiceProvider"
       ]
     }
+  },
+  "require-dev": {
+    "illuminate/pagination": "^13.39",
+    "illuminate/database": "^13.39",
+    "pestphp/pest": "^5.3",
+    "phpstan/phpstan": "^2.3"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Xaamin\\Fractal\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "scripts": {
+    "test": "pest",
+    "analyse": "phpstan analyse --memory-limit=512M",
+    "check": [
+      "@analyse",
+      "@test"
+    ]
   }
 }

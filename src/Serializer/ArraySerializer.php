@@ -10,10 +10,10 @@ class ArraySerializer extends BaseArraySerializer
     /**
      * Serialize a collection.
      *
-     * @param string $resourceKey
-     * @param array  $data
+     * @param string|null $resourceKey
+     * @param array<int|string, mixed> $data
      *
-     * @return array
+     * @return array<int|string, mixed>
      */
     public function collection($resourceKey, array $data)
     {
@@ -23,10 +23,10 @@ class ArraySerializer extends BaseArraySerializer
     /**
      * Serialize an item.
      *
-     * @param string $resourceKey
-     * @param array  $data
+     * @param string|null $resourceKey
+     * @param array<int|string, mixed> $data
      *
-     * @return array
+     * @return array<int|string, mixed>
      */
     public function item($resourceKey, array $data)
     {
@@ -36,7 +36,7 @@ class ArraySerializer extends BaseArraySerializer
     /**
      * Serialize null resource.
      *
-     * @return array
+     * @return array<mixed>|null
      */
     public function null()
     {
@@ -48,7 +48,7 @@ class ArraySerializer extends BaseArraySerializer
      *
      * @param PaginatorInterface $paginator
      *
-     * @return array
+     * @return array<int|string, mixed>
      */
     public function paginator(PaginatorInterface $paginator)
     {
