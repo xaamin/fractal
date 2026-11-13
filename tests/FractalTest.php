@@ -211,3 +211,9 @@ test('magic call unknown method throws', function () {
 
     (new Fractal)->nonExistentMethod();
 });
+
+test('primitive resources are transformed at the top level', function () {
+    $this->assertSame(84, Fractal::make(42, fn ($v) => $v * 2)->toArray());
+    $this->assertSame('hello', Fractal::make('hello')->toArray());
+    $this->assertSame('"HELLO"', Fractal::make('hello', fn ($v) => strtoupper($v))->toJson());
+});

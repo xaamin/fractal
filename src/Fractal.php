@@ -423,7 +423,9 @@ class Fractal
     /**
      * Perform the transformation to array.
      *
-     * @return array<string, mixed>|null
+     * Primitive resources return the transformed value as is, without meta.
+     *
+     * @return array<string, mixed>|mixed|null
      */
     public function toArray()
     {
@@ -431,6 +433,11 @@ class Fractal
         $this->manager->parseExcludes($this->excludes);
 
         $resource = $this->getResource();
+
+        // Fractal only transforms primitives when they are nested as includes
+        if ($resource instanceof Primitive) {
+            return $this->manager->createData($resource)->transformPrimitiveResource();
+        }
 
         if ($this->meta !== []) {
             $resource = clone $resource;
