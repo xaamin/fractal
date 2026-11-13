@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Bloquea composer.lock con paquetes resueltos desde un repo "path" local
+# (p. ej. el repo global sat-suite): sólo funcionan en esta máquina.
+if git diff --cached --name-only --diff-filter=ACMR | grep -qx 'composer.lock' \
+    && git show :composer.lock | grep -q '"type": "path"'; then
+    echo "composer.lock tiene referencias locales (dist type \"path\"):" >&2
+    git show :composer.lock | grep -A1 '"type": "path"' | grep '"url"' | sed 's/^ */  /' >&2
+    echo "Sácalo del commit: git restore --staged composer.lock" >&2
+    exit 1
+fi

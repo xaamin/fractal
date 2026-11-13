@@ -1,0 +1,40 @@
+{
+  "name": "@xaamin/fractal",
+  "version": "2.1.9",
+  "private": true,
+  "description": "Tooling (husky, commitlint, release-it) for xaamin/fractal",
+  "author": "Benjamín Martínez Mateos",
+  "license": "ISC",
+  "scripts": {
+    "test": "vendor/bin/pest",
+    "prepare": "husky install",
+    "code:scan": "vendor/bin/phpstan --memory-limit=256M",
+    "code:baseline": "vendor/bin/phpstan --memory-limit=256M --generate-baseline",
+    "lint:check": "vendor/bin/phpcs --standard=PSR12 --runtime-set ignore_warnings_on_exit 1 ./src",
+    "lint:fix": "vendor/bin/phpcbf --standard=PSR12 ./src",
+    "release": "release-it",
+    "release:minor": "release-it minor",
+    "release:patch": "release-it patch",
+    "release:major": "release-it major"
+  },
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^12.0.2",
+    "conventional-changelog-conventionalcommits": "^10.4.1",
+    "husky": "^8.0.0",
+    "release-it": "^21.1.2"
+  },
+  "dependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "type-case": [2, "always", "lower-case"],
+      "scope-case": [2, "always", "lower-case"],
+      "subject-case": [2, "always", "lower-case"]
+    }
+  }
+}

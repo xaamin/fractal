@@ -3,3 +3,6 @@ parameters:
   paths:
     - src
     - helpers
+
+includes:
+  - phpstan-baseline.neon
