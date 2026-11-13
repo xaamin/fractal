@@ -4,7 +4,7 @@
   "private": true,
   "description": "Tooling (husky, commitlint, release-it) for xaamin/fractal",
   "author": "Benjamín Martínez Mateos",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "test": "vendor/bin/pest",
     "prepare": "husky install",

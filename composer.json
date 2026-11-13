@@ -1,6 +1,7 @@
 {
   "name": "xaamin/fractal",
   "description": "Laravel wrapper for fractal",
+  "license": "MIT",
   "require": {
     "league/fractal": "^0.19.2",
     "illuminate/support": ">=5.0"
