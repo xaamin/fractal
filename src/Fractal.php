@@ -1,4 +1,6 @@
-<?php namespace Xaamin\Fractal;
+<?php
+
+namespace Xaamin\Fractal;
 
 use LogicException;
 use BadMethodCallException;
@@ -83,7 +85,7 @@ class Fractal
         $defaultSerializer = static::$serializer;
 
         $this->manager = $manager ? : new Manager();
-        $this->manager->setSerializer($serializer ? : ($defaultSerializer ? : new ArraySerializer));
+        $this->manager->setSerializer($serializer ? : ($defaultSerializer ? : new ArraySerializer()));
     }
 
     /**
@@ -113,15 +115,15 @@ class Fractal
 
         if ($data instanceof LengthAwarePaginator || $data instanceof Paginator) {
             $fractal->paginate($data, $transformer, $resourceKey ?? 'data');
-        } else if (is_array($data)) {
+        } elseif (is_array($data)) {
             if (Arr::isAssoc($data)) {
                 $fractal->item($data, $transformer, $resourceKey);
             } else {
                 $fractal->collection($data, $transformer, $resourceKey);
             }
-        } else if ($data instanceof Model) {
+        } elseif ($data instanceof Model) {
             $fractal->item($data, $transformer, $resourceKey);
-        } else if ($data instanceof LaravelCollection) {
+        } elseif ($data instanceof LaravelCollection) {
             $fractal->collection($data, $transformer, $resourceKey);
         } else {
             $fractal->primitive($data, $transformer, $resourceKey);
@@ -395,7 +397,7 @@ class Fractal
      */
     protected function getTransformer($transformer = null)
     {
-        return $transformer ?: function($data) {
+        return $transformer ?: function ($data) {
             if ($data instanceof Arrayable) {
                 return $data->toArray();
             }

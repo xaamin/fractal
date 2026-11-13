@@ -1,4 +1,5 @@
 <?php
+
 namespace Xaamin\Fractal\Serializer;
 
 use League\Fractal\Pagination\PaginatorInterface;
@@ -81,5 +82,4 @@ class ArraySerializer extends BaseArraySerializer
 
         return parent::paginator($paginator);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Xaamin\Fractal\Pagination;
 
 use Illuminate\Pagination\Paginator;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Xaamin\Fractal\Providers;
 
 use League\Fractal\Manager;
@@ -15,7 +16,6 @@ class FractalServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
     }
     /**
      * Register any application services.
@@ -25,7 +25,7 @@ class FractalServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind('Xaamin\Fractal\Fractal', function ($app) {
-            return new Fractal(new Manager(), new ArraySerializer);
+            return new Fractal(new Manager(), new ArraySerializer());
         });
     }
 }
