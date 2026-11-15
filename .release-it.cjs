@@ -1,5 +1,5 @@
 // Configuración de release-it: bump de package.json, CHANGELOG.md,
-// commit "chore(release): X.Y.Z" y tag vX.Y.Z (sin push ni publicación).
+// commit "chore(release): X.Y.Z" y tag vX.Y.Z con push de la rama y el tag (sin publicación en npm).
 const { version } = require('./package.json');
 
 const repoUrl = 'https://github.com/xaamin/fractal';
@@ -9,7 +9,7 @@ module.exports = {
     commitMessage: 'chore(release): ${version}',
     tagName: 'v${version}',
     tagAnnotation: 'chore(release): ${version}',
-    push: false,
+    push: true,
   },
   npm: {
     publish: false,
